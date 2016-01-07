@@ -14,6 +14,9 @@ class Router
       user = auth(request)
       return response.sendStatus(401) unless user?
 
+      body = request.body
+      body = undefined unless _.isString body
+
       options =
         host:    request.get('X-Host') ? DEFAULT_HOST
         path:    request.path
@@ -22,9 +25,9 @@ class Router
           'accept':       request.get('accept') ? 'application/json'
           'content-type': request.get('content-type') ? 'application/json'
           'connection':   'close'
-        body:    request.body
+        body:    body
 
-      debug 'auth', accessKeyId: user.name, secretAccessKey: user.pass
+      debug 'aws4.sign', options, accessKeyId: user.name, secretAccessKey: user.pass
       options = aws4.sign(options, accessKeyId: user.name, secretAccessKey: user.pass)
       debug 'http.request', options
       upstreamRequest = http.request options
