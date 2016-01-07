@@ -6,7 +6,17 @@ https = require 'https'
 http  = require 'http'
 
 DEFAULT_HOST = 'search-meshlastic-jzohajyndq6bowz24ic2jnf3vu.us-west-2.es.amazonaws.com'
-OMITTED_HEADERS = ['x-uri', 'Authenticate', 'WWW-Authenticate', 'host']
+OMITTED_HEADERS = [
+  'Authenticate'
+  'host'
+  'WWW-Authenticate'
+  'x-forwarded-for'
+  'x-forwarded-host'
+  'x-forwarded-port'
+  'x-forwarded-proto'
+  'x-forwarded-server'
+  'x-uri'
+]
 
 class Router
   route: (app) =>
