@@ -1,36 +1,27 @@
 _     = require 'lodash'
+auth  = require 'basic-auth'
 aws4  = require 'aws4'
 url   = require 'url'
 https = require 'https'
 http  = require 'http'
 
-OMITTED_HEADERS = ['x-uri', 'x-accesskeyid', 'x-secretaccesskey', 'host']
+DEFAULT_HOST = 'search-meshlastic-jzohajyndq6bowz24ic2jnf3vu.us-west-2.es.amazonaws.com'
+OMITTED_HEADERS = ['x-uri', 'Authenticate', 'WWW-Authenticate', 'host']
 
 class Router
   route: (app) =>
     app.all '*', (request, response) =>
-      return response.status(400).send 'Missing X-Host' unless request.get 'X-Uri'
-      return response.status(400).send 'Missing X-AccessKeyId' unless request.get 'X-AccessKeyId'
-      return response.status(400).send 'Missing X-SecretAccessKey' unless request.get 'X-SecretAccessKey'
-
-      uri             = request.get 'X-Uri'
-      accessKeyId     = request.get 'X-AccessKeyId'
-      secretAccessKey = request.get 'X-SecretAccessKey'
-
-      {hostname,pathname} = url.parse uri
-
-      headers = _.omit request.headers, (value, key) => _.contains OMITTED_HEADERS, key.toLowerCase()
+      user = auth(request)
+      return response.sendStatus(401) unless user?
 
       options =
-        host:    hostname
-        path:    pathname
+        host:    request.get('X-Host') ? DEFAULT_HOST
+        path:    request.path
         method:  request.method
-        headers: headers
+        headers: _.omit request.headers, (value, key) => _.contains OMITTED_HEADERS, key.toLowerCase()
         body:    request.body
 
-      options = aws4.sign options, {accessKeyId, secretAccessKey}
-
-      upstreamRequest = http.request options
+      upstreamRequest = http.request aws4.sign(options, accessKeyId: user.name, secretAccessKey: user.pass)
 
       upstreamRequest.once 'error', (error) =>
         response.status(502).send "Upstream Error: #{error.message}"
