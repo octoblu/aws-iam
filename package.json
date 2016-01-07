@@ -1,6 +1,6 @@
 {
   "name": "aws-iam",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "aws iam proxy takes aws credentials in a request, signs the request, and proxies it up to AWS",
   "main": "server.js",
   "scripts": {
