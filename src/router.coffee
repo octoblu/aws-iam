@@ -4,19 +4,9 @@ aws4  = require 'aws4'
 url   = require 'url'
 https = require 'https'
 http  = require 'http'
+debug = require('debug')('aws-iam:router')
 
 DEFAULT_HOST = 'search-meshlastic-jzohajyndq6bowz24ic2jnf3vu.us-west-2.es.amazonaws.com'
-OMITTED_HEADERS = [
-  'Authenticate'
-  'host'
-  'WWW-Authenticate'
-  'x-forwarded-for'
-  'x-forwarded-host'
-  'x-forwarded-port'
-  'x-forwarded-proto'
-  'x-forwarded-server'
-  'x-uri'
-]
 
 class Router
   route: (app) =>
@@ -28,10 +18,16 @@ class Router
         host:    request.get('X-Host') ? DEFAULT_HOST
         path:    request.path
         method:  request.method
-        headers: _.omit request.headers, (value, key) => _.contains OMITTED_HEADERS, key.toLowerCase()
+        headers:
+          'accept':       request.get('accept') ? 'application/json'
+          'content-type': request.get('content-type') ? 'application/json'
+          'connection':   'close'
         body:    request.body
 
-      upstreamRequest = http.request aws4.sign(options, accessKeyId: user.name, secretAccessKey: user.pass)
+      debug 'auth', accessKeyId: user.name, secretAccessKey: user.pass
+      options = aws4.sign(options, accessKeyId: user.name, secretAccessKey: user.pass)
+      debug 'http.request', options
+      upstreamRequest = http.request options
 
       upstreamRequest.once 'error', (error) =>
         response.status(502).send "Upstream Error: #{error.message}"
@@ -43,6 +39,7 @@ class Router
           body += data
 
         res.on 'end', =>
+          debug 'end', res.statusCode, JSON.parse(body)
           response.status(res.statusCode).send JSON.parse(body)
 
       upstreamRequest.end options.body

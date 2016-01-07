@@ -1,6 +1,6 @@
 {
   "name": "aws-iam",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "aws iam proxy takes aws credentials in a request, signs the request, and proxies it up to AWS",
   "main": "server.js",
   "scripts": {
@@ -26,6 +26,7 @@
     "basic-auth": "^1.0.3",
     "body-parser": "^1.14.2",
     "coffee-script": "^1.10.0",
+    "debug": "^2.2.0",
     "errorhandler": "^1.4.2",
     "express": "^4.13.3",
     "express-meshblu-healthcheck": "^1.0.1",
