@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node command.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "istanbul cover _mocha -- -R spec --require coffee-coverage/register-istanbul"
   },
   "repository": {
     "type": "git",
@@ -30,5 +30,15 @@
     "express-meshblu-healthcheck": "^1.0.1",
     "lodash": "^3.10.1",
     "morgan": "^1.6.1"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "coffee-coverage": "^0.7.0",
+    "coffee-script": "^1.10.0",
+    "istanbul": "^0.4.1",
+    "mocha": "^2.3.4",
+    "mocha-istanbul": "^0.2.0",
+    "sinon": "^1.17.2",
+    "sinon-chai": "^2.8.0"
   }
 }
