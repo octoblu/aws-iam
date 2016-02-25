@@ -13,10 +13,10 @@ class Server
 
   run: (callback) =>
     app = express()
+    app.use meshbluHealthcheck()
     app.use morgan 'dev'
     app.use errorHandler()
     app.use bodyParser.text(limit: '5mb', type: '*/*')
-    app.use meshbluHealthcheck()
 
     router = new Router {}
 
