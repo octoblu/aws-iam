@@ -42,8 +42,13 @@ class Router
           body += data
 
         res.on 'end', =>
-          debug 'end', res.statusCode, JSON.parse(body)
-          response.status(res.statusCode).send JSON.parse(body)
+          try
+            data = JSON.parse body
+          catch error
+            data = body
+
+          debug 'end', res.statusCode, data
+          response.status(res.statusCode).send data
 
       upstreamRequest.end options.body
 
